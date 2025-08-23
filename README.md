@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 旅游规划服务
 
 这是一个为用户提供旅游规划服务的Web应用。
@@ -47,3 +48,7 @@ cd backend
 npm install
 npm start
 ```
+=======
+这里是llm_app
+something about travel
+>>>>>>> 22bbbb7198b29af024d2dd1e400967a6f1fc980c
