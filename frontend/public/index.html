@@ -2,19 +2,26 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <!-- 引入外部资源（link）作为网站小图标，图标为favicon.ico即为浏览器标签页旁边的小图标-->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" /> 
+    <!-- meta表示网页元信息，viewport表示视口，自适应屏幕-->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+    <!-- HTML的元信息， 用于被搜索引擎使用SOE -->
     <meta
       name="description"
       content="旅游规划服务 - 为您提供个性化的旅游规划"
     />
+    <!-- 苹果用户把网页添加到主屏幕时显示的图标 -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!---->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>旅游规划助手</title>
   </head>
+  <!--主体部分-->
   <body>
     <noscript>您需要启用JavaScript才能运行此应用。</noscript>
+    <!-- React提供的挂载点（DOM节点），React用JS把组件整个渲染到div中 -->
     <div id="root"></div>
   </body>
 </html>
