@@ -129,7 +129,7 @@ function App() {
       const loadingMessageId = uuidv4();
       const loadingMessage = {
         id: loadingMessageId,
-        content: '正在生成旅游规划...',
+        content: '思考中...',
         sender: 'assistant', // 标记为助手发送
         isLoading: true, // 标记为加载状态
         timestamp: new Date().toISOString()
@@ -205,7 +205,7 @@ function App() {
                 if (msg.isLoading) {
                   return {
                     ...msg,
-                    content: '抱歉，生成旅游规划时出现错误。请稍后再试。',
+                    content: '抱歉，处理您的请求时出现错误。请稍后再试。',
                     isLoading: false,
                     isError: true // 标记为错误状态
                   };
