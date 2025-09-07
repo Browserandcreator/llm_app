@@ -5,6 +5,7 @@
 
 // 导入DeepSeek服务
 const deepseekService = require('../services/deepseekService');
+const preferenceService = require('../services/preferenceService');
 
 /**
  * 处理聊天请求
@@ -38,11 +39,31 @@ exports.processChat = async (req, res) => {
       return res.json({ reply: travelInfo.reply, conversationId });
     }
     
-    // 第二阶段：构建提示词，包含提取的旅游信息
-    const prompt = buildPrompt(travelInfo);
+    // 第二阶段：构建提示词，包含提取的旅游信息和个性化推荐
+    const prompt = await buildPrompt(travelInfo, req.user);
     
     // 调用DeepSeek API生成旅游规划回复
     const reply = await deepseekService.generateResponse(prompt);
+    
+    // 如果用户已登录，保存旅游历史和提取偏好
+    if (req.user) {
+      try {
+        // 保存旅游历史记录
+        await preferenceService.saveTravelHistory(req.user.id, {
+          destination: travelInfo.destination,
+          days: travelInfo.days,
+          people: travelInfo.people,
+          budget: travelInfo.budget,
+          travelPlan: reply
+        });
+        
+        // 从旅游信息中提取并保存用户偏好
+        await preferenceService.extractPreferencesFromTravel(req.user.id, travelInfo);
+      } catch (prefError) {
+        console.error('保存用户偏好时出错:', prefError);
+        // 不影响主要功能，继续返回回复
+      }
+    }
     
     // 返回成功响应
     return res.json({ reply, conversationId });
@@ -55,16 +76,17 @@ exports.processChat = async (req, res) => {
 
 /**
  * 构建发送给AI的提示词
- * 使用提取的旅游信息构建详细的旅游规划提示词
+ * 使用提取的旅游信息构建详细的旅游规划提示词，并包含个性化推荐
  * 
  * @param {Object} travelInfo - 提取的旅游信息对象
  * @param {string} travelInfo.destination - 目的地
  * @param {string} travelInfo.days - 旅游天数
  * @param {string} travelInfo.people - 旅游人数
  * @param {string} travelInfo.budget - 旅游预算
- * @returns {string} 完整的提示词
+ * @param {Object} user - 用户信息（可选）
+ * @returns {Promise<string>} 完整的提示词
  */
-function buildPrompt(travelInfo) {
+async function buildPrompt(travelInfo, user = null) {
   // 构建旅游信息字符串
   const travelInfoStr = [
     `目的地: ${travelInfo.destination}`,
@@ -73,14 +95,26 @@ function buildPrompt(travelInfo) {
     `预算: ${travelInfo.budget}元`
   ].join('\n');
   
+  // 获取个性化推荐提示（如果用户已登录）
+  let personalizedPrompt = '';
+  if (user) {
+    try {
+      personalizedPrompt = await preferenceService.generatePersonalizedPrompt(user.id);
+    } catch (error) {
+      console.error('获取个性化提示时出错:', error);
+      // 如果获取失败，继续使用基础提示
+    }
+  }
+  
   // 构建完整提示词，包含：
   // 1. 系统指令（旅游助手角色定义）
   // 2. 提取的旅游信息
-  // 3. 回复要求和格式指导
+  // 3. 个性化推荐信息（如果有）
+  // 4. 回复要求和格式指导
   return `你是一个专业的旅游规划助手。请根据用户提供的以下信息，生成一个详细的旅游规划：
 
 用户提供的信息：
-${travelInfoStr}
+${travelInfoStr}${personalizedPrompt}
 
 请提供以下详细信息：
 1. 详细的游玩路径和每日行程安排
