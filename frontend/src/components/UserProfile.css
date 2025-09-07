@@ -1,0 +1,214 @@
+/* 用户信息组件样式 */
+
+.user-profile {
+  position: relative;
+  display: inline-block;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-avatar.large {
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+}
+
+.username {
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-arrow {
+  color: rgba(255, 255, 255, 0.8);
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  min-width: 240px;
+  z-index: 1000;
+  animation: dropdownSlideIn 0.2s ease-out;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-details .username {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.email {
+  color: #6b7280;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0;
+}
+
+.dropdown-menu {
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: #374151;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-item svg {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.dropdown-item.logout {
+  color: #dc2626;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 4px;
+}
+
+.dropdown-item.logout:hover {
+  background-color: #fef2f2;
+}
+
+.dropdown-item.logout svg {
+  color: #dc2626;
+}
+
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+/* 动画效果 */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .user-info {
+    padding: 6px 10px;
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .username {
+    font-size: 0.85rem;
+    max-width: 80px;
+  }
+  
+  .user-dropdown {
+    min-width: 200px;
+    right: -10px;
+  }
+  
+  .dropdown-header {
+    padding: 12px;
+  }
+  
+  .dropdown-item {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-dropdown {
+    right: -20px;
+    left: auto;
+    min-width: 180px;
+  }
+}

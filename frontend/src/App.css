@@ -1,8 +1,49 @@
 /* 基本样式 */
 .app-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+}
+
+/* 顶部用户认证区域 */
+.app-header {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-button {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
+
+/* 主内容区域 */
+.app-main {
+  display: flex;
+  flex: 1;
+  height: 100%;
 }
 
 .sidebar {
@@ -25,6 +66,7 @@
   flex-direction: column;
   height: 100%;
   transition: margin-left 0.3s ease;
+  padding-top: 60px; /* 为顶部用户区域留出空间 */
 }
 
 .chat-area.sidebar-open {

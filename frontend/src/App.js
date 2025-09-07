@@ -12,6 +12,8 @@ import Box from '@mui/material/Box';
 // 导入自定义组件：侧边栏和聊天区域
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
+import AuthModal from './components/AuthModal';
+import UserProfile from './components/UserProfile';
 
 // 导入样式文件
 import './App.css';
@@ -41,6 +43,25 @@ function App() {
   
   // isSidebarOpen: 侧边栏是否打开的状态
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  
+  // 用户认证相关状态
+  const [user, setUser] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // 副作用钩子：检查用户登录状态
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (token && userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (error) {
+        console.error('解析用户数据失败:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   // 副作用钩子：在组件挂载或conversations变化时执行
   useEffect(() => {
@@ -149,11 +170,19 @@ function App() {
       });
 
       // 调用后端API获取回复
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      // 如果用户已登录，添加认证头
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           message, // 当前消息
           conversationId: currentConversationId, // 对话ID
@@ -224,6 +253,21 @@ function App() {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  
+  // 处理用户登录成功
+  const handleLoginSuccess = (userData, token) => {
+    setUser(userData);
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setIsAuthModalOpen(false);
+  };
+  
+  // 处理用户登出
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  };
 
   // 获取当前对话，如果不存在则提供默认值
   const currentConversation = conversations.find(conv => conv.id === currentConversationId) || { messages: [] };
@@ -233,22 +277,51 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* 重置CSS基础样式 */}
       <Box className="app-container">
-        {/* 侧边栏组件 */}
-        <Sidebar 
-          conversations={conversations} // 所有对话
-          currentConversationId={currentConversationId} // 当前对话ID
-          onNewConversation={handleNewConversation} // 新建对话处理函数
-          onSelectConversation={handleSelectConversation} // 选择对话处理函数
-          onDeleteConversation={handleDeleteConversation} // 删除对话处理函数
-          isOpen={isSidebarOpen} // 侧边栏开关状态
-          toggleSidebar={toggleSidebar} // 切换侧边栏函数
-        />
-        {/* 聊天区域组件 */}
-        <ChatArea 
-          messages={currentConversation.messages} // 当前对话的消息列表
-          onSendMessage={handleSendMessage} // 发送消息处理函数
-          isSidebarOpen={isSidebarOpen} // 侧边栏状态（用于响应式布局）
-        />
+        {/* 顶部用户认证区域 */}
+        <Box className="app-header">
+          {user ? (
+            <UserProfile 
+              user={user}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <button 
+              className="login-button"
+              onClick={() => setIsAuthModalOpen(true)}
+            >
+              登录 / 注册
+            </button>
+          )}
+        </Box>
+        
+        {/* 主内容区域 */}
+        <Box className="app-main">
+          {/* 侧边栏组件 */}
+          <Sidebar 
+            conversations={conversations} // 所有对话
+            currentConversationId={currentConversationId} // 当前对话ID
+            onNewConversation={handleNewConversation} // 新建对话处理函数
+            onSelectConversation={handleSelectConversation} // 选择对话处理函数
+            onDeleteConversation={handleDeleteConversation} // 删除对话处理函数
+            isOpen={isSidebarOpen} // 侧边栏开关状态
+            toggleSidebar={toggleSidebar} // 切换侧边栏函数
+          />
+          {/* 聊天区域组件 */}
+          <ChatArea 
+            messages={currentConversation.messages} // 当前对话的消息列表
+            onSendMessage={handleSendMessage} // 发送消息处理函数
+            isSidebarOpen={isSidebarOpen} // 侧边栏状态（用于响应式布局）
+          />
+        </Box>
+        
+        {/* 认证模态框 */}
+        {isAuthModalOpen && (
+          <AuthModal 
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            onLoginSuccess={handleLoginSuccess}
+          />
+        )}
       </Box>
     </ThemeProvider>
   );
